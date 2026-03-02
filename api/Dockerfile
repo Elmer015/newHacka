@@ -11,4 +11,6 @@ COPY . .
 
 EXPOSE 5000
 
-CMD while ! nc -z postgres 5432; do sleep 1; done && node server.js
+# don't block startup waiting on a hardcoded host name; configuration will
+# be provided via environment variables (Railway gives DATABASE_URL etc).
+CMD ["node", "server.js"]
