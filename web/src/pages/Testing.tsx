@@ -4,7 +4,7 @@ import { ArrowLeft, Send, FlaskConical, CheckCircle2, Hash, FileText } from "luc
 import { useToast } from "@/hooks/use-toast";
 import logoImg from "@/assets/transtrack-logo.png";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://newhacka-production-1b08.up.railway.app";
 
 interface TxResult {
   success: boolean;
@@ -90,7 +90,7 @@ export default function Testing() {
         toast({ title: "Transaksi Berhasil!", description: `TX UUID: ${json.txUuid}` });
       }
     } catch {
-      const msg = "Tidak dapat terhubung ke server. Pastikan backend berjalan di localhost:5000.";
+      const msg = "Tidak dapat terhubung ke server. Pastikan backend berjalan di https://newhacka-production-1b08.up.railway.app atau sesuaikan VITE_API_BASE_URL.";
       setResult({ success: false, error: msg });
       toast({ title: "Koneksi Gagal", description: msg, variant: "destructive" });
     } finally {

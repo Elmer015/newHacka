@@ -26,7 +26,7 @@ export default function Register() {
     setIsLoading(true);
     setError(null);
 
-    const API_BASE = import.meta.env.VITE_API_BASE_URL || "";
+    const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://newhacka-production-1b08.up.railway.app";
 
     try {
       const res = await fetch(`${API_BASE}/api/auth/register`, {

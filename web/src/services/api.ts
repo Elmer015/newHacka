@@ -6,8 +6,9 @@
 import type { Transaction, TransactionStatus, NewBackendTransaction } from "@/types/transaction";
 import { supabase } from "@/integrations/supabase/client";
 
-// Saat dev lokal, proxy Vite meneruskan /api/* ke localhost:5000 secara otomatis.
-// const API_BASE = import.meta.env.VITE_API_BASE_URL || "";
+// Default API base. In production we want the frontend to call the deployed
+// backend on Railway. Developers can still override with VITE_API_BASE_URL.
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://newhacka-production-1b08.up.railway.app";
 
 /** Raw shape from new backend response (transactions/user) */
 
@@ -212,7 +213,7 @@ export interface LoginResult {
 }
 
 export async function login(credentials: LoginCredentials): Promise<LoginResult> {
-  const base = "";
+  const base = API_BASE;
   try {
     const res = await fetch(`${base}/api/auth/login`, {
       method: "POST",
@@ -278,7 +279,7 @@ export async function loadUserProfile(): Promise<{ isPublic: boolean; monitoring
 }
 
 export async function deleteShareId(): Promise<{ success: boolean; error?: string }> {
-  const base = "";
+  const base = API_BASE;
   try {
     const token = localStorage.getItem("auth_token");
     const headers: Record<string, string> = { "Content-Type": "application/json" };
@@ -301,7 +302,7 @@ export async function deleteShareId(): Promise<{ success: boolean; error?: strin
 }
 
 export async function generateShareId(): Promise<{ success: boolean; monitoringId?: string; error?: string }> {
-  const base = "";
+  const base = API_BASE;
   try {
     const token = localStorage.getItem("auth_token");
     const headers: Record<string, string> = { "Content-Type": "application/json" };
@@ -356,7 +357,7 @@ export interface PublicUserTransactionsResult {
 }
 
 export async function fetchPublicUserData(userId: string): Promise<PublicUserTransactionsResult> {
-  const base = "";
+  const base = API_BASE;
   
   try {
     const token = localStorage.getItem("auth_token");

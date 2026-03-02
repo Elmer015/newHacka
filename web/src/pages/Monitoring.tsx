@@ -98,7 +98,7 @@ function AIChatPopup({
     setAiLoading(true);
 
     try {
-      const base = import.meta.env.VITE_API_BASE_URL || "";
+      const base = import.meta.env.VITE_API_BASE_URL || "https://newhacka-production-1b08.up.railway.app";
       const token = localStorage.getItem("auth_token");
       const headers: Record<string, string> = { "Content-Type": "application/json" };
       if (token) headers["Authorization"] = `Bearer ${token}`;
