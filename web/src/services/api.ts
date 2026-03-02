@@ -8,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 // Default API base. In production we want the frontend to call the deployed
 // backend on Railway. Developers can still override with VITE_API_BASE_URL.
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://newhacka-production-1b08.up.railway.app";
+const API_BASE = "https://newhacka-production-1b08.up.railway.app";
 
 /** Raw shape from new backend response (transactions/user) */
 
