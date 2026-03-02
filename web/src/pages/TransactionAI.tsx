@@ -106,71 +106,31 @@ export default function TransactionAI() {
     setMessages(newMessages);
     setAiLoading(true);
 
-    let assistantContent = "";
-
     try {
-      const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-      const PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+      const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://newhacka-production-1b08.up.railway.app";
+      const token = localStorage.getItem("auth_token");
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (token) headers["Authorization"] = `Bearer ${token}`;
 
-      const resp = await fetch(`${SUPABASE_URL}/functions/v1/transaction-chat`, {
+      // Call backend /api/analyze endpoint with the latest question
+      const resp = await fetch(`${API_BASE}/api/analyze`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${PUBLISHABLE_KEY}`,
-        },
-        body: JSON.stringify({
-          messages: newMessages,
-          transactions: transactions.slice(0, 20),
-        }),
+        headers,
+        body: JSON.stringify({ question: userText }),
       });
 
       if (!resp.ok) {
         const errData = await resp.json().catch(() => ({}));
-        if (resp.status === 429) throw new Error("Rate limit tercapai, coba lagi beberapa saat.");
-        if (resp.status === 402) throw new Error("Kredit AI habis. Tambah kredit di pengaturan workspace.");
-        throw new Error(errData.error ?? "Gagal menghubungi AI");
+        throw new Error(errData.error ?? errData.message ?? "Gagal menghubungi AI");
       }
 
-      if (!resp.body) throw new Error("Tidak ada response stream");
+      const json = await resp.json();
+      const assistantContent = json?.data?.analisis ?? json?.analisis ?? "Tidak ada jawaban dari AI.";
 
-      const reader = resp.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = "";
-
-      // Add empty assistant message
-      setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buffer += decoder.decode(value, { stream: true });
-
-        let newlineIdx: number;
-        while ((newlineIdx = buffer.indexOf("\n")) !== -1) {
-          let line = buffer.slice(0, newlineIdx);
-          buffer = buffer.slice(newlineIdx + 1);
-          if (line.endsWith("\r")) line = line.slice(0, -1);
-          if (!line.startsWith("data: ") || line.trim() === "") continue;
-          const jsonStr = line.slice(6).trim();
-          if (jsonStr === "[DONE]") break;
-          try {
-            const parsed = JSON.parse(jsonStr);
-            const delta = parsed.choices?.[0]?.delta?.content as string | undefined;
-            if (delta) {
-              assistantContent += delta;
-              setMessages((prev) => {
-                const updated = [...prev];
-                updated[updated.length - 1] = { role: "assistant", content: assistantContent };
-                return updated;
-              });
-            }
-          } catch { /* partial JSON */ }
-        }
-      }
+      setMessages((prev) => [...prev, { role: "assistant", content: assistantContent }]);
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Terjadi kesalahan";
       setError(msg);
-      setMessages((prev) => prev.filter((m) => !(m.role === "assistant" && m.content === "")));
     } finally {
       setAiLoading(false);
     }
