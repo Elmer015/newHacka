@@ -22,6 +22,8 @@ app.get('/api/transactions/user', authMiddleware, getVerifiedTransactions);
 app.post('/api/analyze', authMiddleware, aiAnalyze);
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-    console.log(`🔥 Server Berhasil Jalan!\n📍 URL: http://localhost:${PORT}`);
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log("🔥 Server Berhasil Jalan!");
+  console.log(`📍 URL: http://localhost:${PORT}`);
 });
